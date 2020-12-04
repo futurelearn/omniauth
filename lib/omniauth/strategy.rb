@@ -175,7 +175,7 @@ module OmniAuth
     #
     # @param env [Hash] The Rack environment.
     def call!(env) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
-      unless env['rack.session']
+      unless env[OmniAuth.config.cookie_store]
         error = OmniAuth::NoSessionError.new('You must provide a session to use OmniAuth.')
         raise(error)
       end
@@ -218,9 +218,9 @@ module OmniAuth
         request_phase
       else
         if request.params[options.origin_param]
-          env['rack.session']['omniauth.origin'] = request.params[options.origin_param]
+          env[OmniAuth.config.cookie_store]['omniauth.origin'] = request.params[options.origin_param]
         elsif env['HTTP_REFERER'] && !env['HTTP_REFERER'].match(/#{request_path}$/)
-          env['rack.session']['omniauth.origin'] = env['HTTP_REFERER']
+          env[OmniAuth.config.cookie_store]['omniauth.origin'] = env['HTTP_REFERER']
         end
 
         request_phase
@@ -449,7 +449,7 @@ module OmniAuth
     end
 
     def session
-      @env['rack.session']
+      @env[OmniAuth.config.cookie_store]
     end
 
     def request
